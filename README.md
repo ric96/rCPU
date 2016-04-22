@@ -7,10 +7,10 @@ The program will automatically adjust the display according to the number of CPU
 
 ###How to build and run
 
-#####On the Raspberry Pi (and other Debian based systems probaby)
+#####On the Roseapple Pi (and other Debian based systems probaby)
 You should be able to do this:
 ```
-git clone https://github.com/ric96/rCPU
+git clone https://github.com/ric96/rCPU -b roseapple
 cd rCPU/rCPU/
 sudo make install
 ```
@@ -25,7 +25,7 @@ sudo make uninstall
 Just do this:
 
 ```
-git clone https://github.com/ric96/rCPU
+git clone https://github.com/ric96/rCPU -b roseapple
 cd rCPU/rCPU/
 make
 sudo ./rcpu 80
