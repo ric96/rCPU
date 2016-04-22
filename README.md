@@ -25,7 +25,7 @@ sudo make uninstall
 Just do this:
 
 ```
-git clone https://github.com/davidsblog/rCPU
+git clone https://github.com/ric96/rCPU
 cd rCPU/rCPU/
 make
 sudo ./rcpu 80
