@@ -145,7 +145,7 @@ double get_temp()
 #ifdef __APPLE__
     return rand() % 100;
 #else
-    FILE *temperature = fopen ("/sys/class/thermal/thermal_zone1/temp", "r");
+    FILE *temperature = fopen ("/sys/class/hwmon/hwmon0/temp2_input", "r");
     if (temperature != NULL)
     {
         double cpu_temp = 0;
