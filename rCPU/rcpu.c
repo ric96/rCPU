@@ -10,7 +10,7 @@
 #include "code.h"
 #include "index.h"
 #include "jquery-2-1-0-min.h"
-#include "smoothie.h"
+#include "flot.h"
 
 void* polling_thread(void *args);
 void send_response(struct hitArgs *args, char*, char*, http_verb);
@@ -37,17 +37,18 @@ int main(int argc, char **argv)
 	}
 	
     max_cpu = get_graph_count();
-    usages = malloc(max_cpu * sizeof(int));
+    usages = mallocx(max_cpu * sizeof(int));
 
     if (pthread_create(&polling_thread_id, NULL, polling_thread, NULL) !=0)
     {
-        puts("Error: pthread_create could not create polling thread");
-        return 0;
+        fprintf(stderr, "Error: pthread_create could not create polling thread");
+        exit(EXIT_FAILURE);
     }
     
     // don't read from the console or log anything
     dwebserver(atoi(argv[1]), &send_response, &log_filter);
     
+    free(usages);
     return 1; // just to stop compiler complaints
 }
 
@@ -102,7 +103,7 @@ void send_cpu_response(struct hitArgs *args, char *path, char *request_body)
             string_add(response, tmp);
             if (p < max_cpu-1)
             {
-                string_add(response, ", ");
+                string_add(response, ",");
             }
         }
         string_add(response, "]");
@@ -128,11 +129,11 @@ void send_temp_response(struct hitArgs *args, char *path, char *request_body)
     
     if (temp >= 0)
     {
-        sprintf(tmp, "%6.3f C", temp);
+        sprintf(tmp, "%6.2f", temp);
     }
     else
     {
-        sprintf(tmp, "unknown");
+        sprintf(tmp, "?");
     }
     
     string_add(response, tmp);
@@ -143,7 +144,8 @@ void send_temp_response(struct hitArgs *args, char *path, char *request_body)
 double get_temp()
 {
 #ifdef __APPLE__
-    return rand() % 100;
+    return 25 + rand() % 100;
+    //return -1;
 #else
     FILE *temperature = fopen ("/sys/class/hwmon/hwmon0/temp2_input", "r");
     if (temperature != NULL)
@@ -169,7 +171,6 @@ int path_ends_with(char *path, char *match)
 
 void send_file_response(struct hitArgs *args, char *path, char *request_body, int path_length)
 {
-	long len = 0;
     STRING *response = new_string(1024);
     string_add(response, "HTTP/1.1 200 OK\n");
     string_add(response, "Connection: close\n");
@@ -181,29 +182,27 @@ void send_file_response(struct hitArgs *args, char *path, char *request_body, in
         write_header(args->socketfd, string_chars(response), index_html_len);
         write(args->socketfd, index_html, index_html_len);
     }
-    if (path_ends_with(path, "code.js"))
+    else if (path_ends_with(path, "code.js"))
     {
         string_add(response, "text/javascript");
         write_header(args->socketfd, string_chars(response), code_js_len);
         write(args->socketfd, code_js, code_js_len);
     }
-    if (path_ends_with(path, "smoothie.js"))
-    {
-        string_add(response, "text/javascript");
-        write_header(args->socketfd, string_chars(response), smoothie_js_len);
-        write(args->socketfd, smoothie_js, smoothie_js_len);
-    }
-    if (path_ends_with(path, "jquery-2-1-0-min.js"))
+    else if (path_ends_with(path, "jquery-2-1-0-min.js"))
     {
         string_add(response, "text/javascript");
         write_header(args->socketfd, string_chars(response), jquery_2_1_0_min_js_len);
         write(args->socketfd, jquery_2_1_0_min_js, jquery_2_1_0_min_js_len);
     }
-	
-    if (len==0)
+    else if (path_ends_with(path, "flot.js"))
     {
-        string_free(response);
-        return notfound_404(args, "no such file");
+        string_add(response, "text/javascript");
+        write_header(args->socketfd, string_chars(response), flot_js_len);
+        write(args->socketfd, flot_js, flot_js_len);
+    }
+    else
+    {
+        notfound_404(args, "no such file");
     }
     
     string_free(response);
