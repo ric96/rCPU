@@ -11,10 +11,10 @@ The program will automatically adjust the display according to the number of CPU
 
 ###How to build and run
 
-#####On the Roseapple Pi (and other Debian based systems probaby)
+#####On the Nano PC T2 (and other Debian based systems probaby)
 You should be able to do this:
 ```
-git clone https://github.com/ric96/rCPU -b roseapple
+git clone https://github.com/ric96/rCPU -b nanopct2
 cd rCPU/rCPU/
 sudo make install
 ```
