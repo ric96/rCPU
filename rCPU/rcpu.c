@@ -147,7 +147,7 @@ double get_temp()
     return 25 + rand() % 100;
     //return -1;
 #else
-    FILE *temperature = fopen ("/sys/class/thermal/thermal_zone1/temp", "r");
+    FILE *temperature = fopen ("/sys/class/hwmon/hwmon0/device/temp_value", "r");
     if (temperature != NULL)
     {
         double cpu_temp = 0;
